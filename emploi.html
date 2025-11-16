@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Semaine en grand</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f4f5fb;
+        color: #111827;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+
+      header p {
+        margin: 0.35rem 0 0;
+        font-size: 0.9rem;
+        opacity: 0.95;
+      }
+
+      .btn-back {
+        border: none;
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        background: rgba(15, 23, 42, 0.25);
+        color: #e5e7eb;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .btn-back:hover {
+        background: rgba(15, 23, 42, 0.4);
+      }
+
+      main {
+        flex: 1;
+        max-width: 1200px;
+        margin: 1.75rem auto 2.25rem;
+        padding: 0 1rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem 1.5rem;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        overflow: auto;
+      }
+
+      .legend {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
+        align-items: center;
+      }
+
+      .legend-title {
+        font-weight: 600;
+      }
+
+      .legend-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 0.9rem;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.82rem;
+        color: #4b5563;
+      }
+
+      .legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+      }
+
+      .timetable {
+        display: grid;
+        grid-template-columns: 70px repeat(7, minmax(0, 1fr));
+        border-collapse: collapse;
+        font-size: 0.83rem;
+        min-width: 100%;
+      }
+
+      .timetable-header {
+        background: #e5e7eb;
+      }
+
+      .timetable-header div {
+        padding: 0.45rem 0.35rem;
+        text-align: center;
+        font-weight: 600;
+        border-right: 1px solid #d1d5db;
+      }
+
+      .timetable-header div:last-child {
+        border-right: none;
+      }
+
+      .time-col {
+        text-align: right;
+        padding: 0.3rem 0.5rem;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        color: #6b7280;
+        font-size: 0.8rem;
+        background: #f9fafb;
+      }
+
+      .cell {
+        min-height: 32px;
+        border-bottom: 1px solid #e5e7eb;
+        border-right: 1px solid #e5e7eb;
+        position: relative;
+        background: #ffffff;
+      }
+
+      .cell:last-child {
+        border-right: none;
+      }
+
+      .slot-block {
+        position: absolute;
+        inset: 3px 2px;
+        border-radius: 6px;
+        padding: 2px 4px;
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #111827;
+      }
+
+      .slot-cleaning {
+        background: #bfdbfe;
+        border-left: 3px solid #1d4ed8;
+      }
+
+      .slot-other {
+        background: #e5e7eb;
+        border-left: 3px solid #4b5563;
+      }
+
+      .note {
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Semaine en grand</h1>
+        <p>Vue par colonnes (jours) et lignes (heures de 7h à 22h).</p>
+      </div>
+      <button
+        class="btn-back"
+        type="button"
+        onclick="window.location.href='index.html'"
+      >
+        ← Retour aux jours
+      </button>
+    </header>
+
+    <main>
+      <section class="card" aria-label="Emploi du temps de la semaine">
+        <div class="legend">
+          <span class="legend-title">Couleurs des activités :</span>
+          <ul class="legend-list" id="legendList">
+            <!-- Légende générée par JS -->
+          </ul>
+        </div>
+        <div id="timetable" class="timetable"></div>
+        <p class="note">
+          Les créneaux viennent de ce que tu as saisi dans la page "Journée de
+          travail". Chaque case représente 1 heure entre 7h et 22h.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const days = [
+        "Lun",
+        "Mar",
+        "Mer",
+        "Jeu",
+        "Ven",
+        "Sam",
+        "Dim",
+      ];
+      const HOURS_START = 7;
+      const HOURS_END = 22; // exclusif pour la boucle (on affiche 7-21)
+
+      const timetable = document.getElementById("timetable");
+      const legendList = document.getElementById("legendList");
+
+      let schedule =
+        JSON.parse(localStorage.getItem("daySchedule") || "null") || [];
+      if (!Array.isArray(schedule) || schedule.length !== 7) {
+        schedule = Array.from({ length: 7 }, () => []);
+      }
+
+      // Palette de couleurs pour les activités
+      const activityPalette = [
+        { bg: "#bfdbfe", border: "#1d4ed8" }, // bleu
+        { bg: "#fee2e2", border: "#b91c1c" }, // rouge
+        { bg: "#dcfce7", border: "#16a34a" }, // vert
+        { bg: "#fef3c7", border: "#d97706" }, // orange
+        { bg: "#ede9fe", border: "#7c3aed" }, // violet
+        { bg: "#e0f2fe", border: "#0284c7" }, // cyan
+        { bg: "#fce7f3", border: "#db2777" }, // rose
+      ];
+
+      const activityColors = {};
+      let paletteIndex = 0;
+
+      function getActivityColor(activity) {
+        if (!activityColors[activity]) {
+          const color =
+            activityPalette[paletteIndex % activityPalette.length];
+          activityColors[activity] = color;
+          paletteIndex++;
+        }
+        return activityColors[activity];
+      }
+
+      function createHeader() {
+        const headerRow = document.createElement("div");
+        headerRow.className = "timetable-header";
+        headerRow.style.display = "contents";
+
+        const empty = document.createElement("div");
+        empty.textContent = "";
+        headerRow.appendChild(empty);
+
+        days.forEach((d) => {
+          const cell = document.createElement("div");
+          cell.textContent = d;
+          headerRow.appendChild(cell);
+        });
+
+        timetable.appendChild(headerRow);
+      }
+
+      function createGrid() {
+        for (let hour = HOURS_START; hour < HOURS_END; hour++) {
+          const timeCol = document.createElement("div");
+          timeCol.className = "time-col";
+          timeCol.textContent = hour + "h";
+          timetable.appendChild(timeCol);
+
+          for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.dataset.day = String(dayIndex);
+            cell.dataset.hour = String(hour);
+            timetable.appendChild(cell);
+          }
+        }
+      }
+
+      function parseMinutes(time) {
+        if (!time || !time.includes(":")) return 0;
+        const [h, m] = time.split(":").map(Number);
+        return h * 60 + m;
+      }
+
+      function renderLegend() {
+        legendList.innerHTML = "";
+
+        const activitiesSet = new Set();
+        for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+          (schedule[dayIndex] || []).forEach((slot) => {
+            if (slot && slot.activity) {
+              activitiesSet.add(slot.activity);
+            }
+          });
+        }
+
+        const activities = Array.from(activitiesSet);
+
+        if (activities.length === 0) {
+          const li = document.createElement("li");
+          li.className = "legend-item";
+          li.textContent = "Aucune activité encore définie.";
+          legendList.appendChild(li);
+          return;
+        }
+
+        activities.forEach((activity) => {
+          const color = getActivityColor(activity);
+
+          const li = document.createElement("li");
+          li.className = "legend-item";
+
+          const colorBox = document.createElement("span");
+          colorBox.className = "legend-color";
+          colorBox.style.backgroundColor = color.bg;
+          colorBox.style.borderColor = color.border;
+
+          const label = document.createElement("span");
+          label.textContent = activity;
+
+          li.appendChild(colorBox);
+          li.appendChild(label);
+          legendList.appendChild(li);
+        });
+      }
+
+      function renderSlots() {
+        for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+          const slots = schedule[dayIndex] || [];
+
+          slots.forEach((slot) => {
+            const startMin = parseMinutes(slot.start);
+            const endMin = parseMinutes(slot.end);
+            if (endMin <= startMin) return;
+
+            const startHour = Math.max(
+              HOURS_START,
+              Math.floor(startMin / 60)
+            );
+            const endHour = Math.min(
+              HOURS_END,
+              Math.ceil(endMin / 60)
+            );
+
+            for (let h = startHour; h < endHour; h++) {
+              const cell = timetable.querySelector(
+                '.cell[data-day="' + dayIndex + '"][data-hour="' + h + '"]'
+              );
+              if (!cell || cell.querySelector(".slot-block")) continue;
+
+              const block = document.createElement("div");
+              const color = getActivityColor(slot.activity || "Autre");
+              block.className = "slot-block";
+              block.style.backgroundColor = color.bg;
+              block.style.borderLeft = "3px solid " + color.border;
+              // Si un raccourci existe, on affiche seulement le raccourci,
+              // sinon on affiche le type d'activité.
+              block.textContent = slot.shortcut || slot.activity;
+
+              cell.appendChild(block);
+            }
+          });
+        }
+      }
+
+      createHeader();
+      createGrid();
+      renderLegend();
+      renderSlots();
+    </script>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Emploi du temps - Vue journée</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at top left, #e0e7ff, #f9fafb);
+        color: #0f172a;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 1.4rem 1.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+
+      header span {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .back {
+        border-radius: 999px;
+        padding: 0.45rem 1rem;
+        border: 1px solid #cbd5e1;
+        font-size: 0.85rem;
+        color: #1f2937;
+        text-decoration: none;
+        background: #ffffffaa;
+        backdrop-filter: blur(6px);
+      }
+
+      .back:hover {
+        background: #e5e7eb;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1.5rem 1rem 2rem;
+      }
+
+      .board {
+        width: 100%;
+        max-width: 900px;
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+        padding: 1.8rem 2rem 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+      }
+
+      .board-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .board-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .board-header span {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .timeline {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .event {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 1.2rem;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed #e5e7eb;
+      }
+
+      .event:last-child {
+        border-bottom: none;
+      }
+
+      .event-time {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #4b5563;
+      }
+
+      .event-card {
+        padding: 0.8rem 1rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+        border: 1px solid #d1d5db;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .event-card::before {
+        content: "";
+        position: absolute;
+        left: -30px;
+        top: -30px;
+        width: 90px;
+        height: 90px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.5), transparent);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .event:nth-child(odd) .event-card {
+        background: linear-gradient(135deg, #fee2e2, #fef3c7);
+      }
+
+      .event:nth-child(odd) .event-card::before {
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.5), transparent);
+      }
+
+      .event-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+      }
+
+      .event-sub {
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+
+      .empty {
+        text-align: center;
+        font-size: 0.95rem;
+        color: #9ca3af;
+        padding: 2rem 1rem;
+        font-style: italic;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #9ca3af;
+        padding-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1 id="headerDay">Emploi du temps</h1>
+        <span>Vue claire et lisible de ta journée.</span>
+      </div>
+      <a href="jour.html" class="back">⬅ Retour à l'édition de la journée</a>
+    </header>
+
+    <main>
+      <div class="board">
+        <div class="board-header">
+          <h2 id="dayTitle">Jour</h2>
+          <span>Les créneaux sont triés par heure.</span>
+        </div>
+        <ul class="timeline" id="timeline"></ul>
+      </div>
+    </main>
+
+    <footer>Emploi du temps stocké localement dans ton navigateur.</footer>
+
+    <script>
+      const days = [
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi",
+        "Dimanche",
+      ];
+
+      let selectedDayIndex = Number(
+        localStorage.getItem("selectedDayIndex") || "0"
+      );
+      if (
+        Number.isNaN(selectedDayIndex) ||
+        selectedDayIndex < 0 ||
+        selectedDayIndex > 6
+      ) {
+        selectedDayIndex = 0;
+      }
+
+      let schedule =
+        JSON.parse(localStorage.getItem("daySchedule") || "null") || [];
+      if (!Array.isArray(schedule) || schedule.length !== 7) {
+        schedule = Array.from({ length: 7 }, () => []);
+      }
+
+      const headerDay = document.getElementById("headerDay");
+      const dayTitle = document.getElementById("dayTitle");
+      const timeline = document.getElementById("timeline");
+
+      function render() {
+        const dayName = days[selectedDayIndex];
+        headerDay.textContent = "Emploi du temps du " + dayName.toLowerCase();
+        dayTitle.textContent = dayName;
+
+        timeline.innerHTML = "";
+        const slots = [...schedule[selectedDayIndex]].sort((a, b) =>
+          a.start.localeCompare(b.start)
+        );
+
+        if (slots.length === 0) {
+          const li = document.createElement("li");
+          li.className = "empty";
+          li.textContent =
+            "Aucun créneau enregistré pour ce jour. Retourne sur la page précédente pour ajouter ton emploi du temps.";
+          timeline.appendChild(li);
+          return;
+        }
+
+        slots.forEach((slot) => {
+          const li = document.createElement("li");
+          li.className = "event";
+
+          const time = document.createElement("div");
+          time.className = "event-time";
+          time.textContent = slot.start + " - " + slot.end;
+
+          const card = document.createElement("div");
+          card.className = "event-card";
+
+          const title = document.createElement("div");
+          title.className = "event-title";
+          title.textContent = slot.activity;
+
+          const sub = document.createElement("div");
+          sub.className = "event-sub";
+          sub.textContent = "Créneau enregistré dans ton planning";
+
+          card.appendChild(title);
+          card.appendChild(sub);
+          li.appendChild(time);
+          li.appendChild(card);
+          timeline.appendChild(li);
+        });
+      }
+
+      render();
+    </script>
+  </body>
+</html>
+
+

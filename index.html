@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mon emploi du temps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f4f5fb;
+        color: #1f2933;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white;
+        padding: 1.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+      }
+
+      header h1 {
+        margin: 0 0 0.25rem;
+        font-size: 1.9rem;
+      }
+
+      header p {
+        margin: 0;
+        opacity: 0.9;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 1rem 2rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .top-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 0.25rem;
+      }
+
+      .btn-primary {
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        background: #4f46e5;
+        color: white;
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.35);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .btn-primary:hover {
+        background: #4338ca;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem 2rem 2rem;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .card h2 {
+        margin-top: 0;
+        font-size: 1.4rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .week {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.1rem;
+        grid-auto-rows: minmax(140px, 1fr);
+      }
+
+      @media (max-width: 700px) {
+        .week {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .day {
+        background: #eef2ff;
+        border-radius: 16px;
+        padding: 2.1rem 1rem;
+        text-align: center;
+        border: 1px solid #c7d2fe;
+        box-shadow: 0 12px 26px rgba(79, 70, 229, 0.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.15s ease,
+          background 0.15s ease, border-color 0.15s ease;
+      }
+
+      .day span {
+        font-size: clamp(1.7rem, 2.7vw, 2.4rem);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #312e81;
+      }
+
+      .day--weekend {
+        background: #fef3c7;
+        border-color: #fde68a;
+      }
+
+      .day--weekend span {
+        color: #b45309;
+      }
+
+      .day:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(79, 70, 229, 0.2);
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Mon emploi du temps</h1>
+      <p>Application dédiée au planning de travail : vue par jour.</p>
+    </header>
+
+    <main>
+      <div class="top-actions">
+        <button
+          type="button"
+          class="btn-primary"
+          id="viewWeekBtn"
+        >
+          📅 Voir la semaine en grand
+        </button>
+      </div>
+
+      <section class="card" aria-label="Jours de la semaine">
+        <h2>Jours de la semaine</h2>
+        <div class="week">
+          <div class="day" data-day="0"><span>Lundi</span></div>
+          <div class="day" data-day="1"><span>Mardi</span></div>
+          <div class="day" data-day="2"><span>Mercredi</span></div>
+          <div class="day" data-day="3"><span>Jeudi</span></div>
+          <div class="day" data-day="4"><span>Vendredi</span></div>
+          <div class="day day--weekend" data-day="5"><span>Samedi</span></div>
+          <div class="day day--weekend" data-day="6"><span>Dimanche</span></div>
+        </div>
+
+        <p class="footer">
+          Cette page affiche uniquement les jours de travail pour ton métier.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const dayElements = document.querySelectorAll(".day");
+      const viewWeekBtn = document.getElementById("viewWeekBtn");
+
+      dayElements.forEach((dayEl) => {
+        dayEl.addEventListener("click", () => {
+          const index = Number(dayEl.dataset.day);
+          if (Number.isNaN(index)) return;
+
+          // On garde le jour choisi pour les autres pages
+          localStorage.setItem("selectedDayIndex", String(index));
+          // On va sur la page détaillée de la journée
+          window.location.href = "jour.html";
+        });
+      });
+
+      viewWeekBtn.addEventListener("click", () => {
+        window.location.href = "emploi.html";
+      });
+    </script>
+  </body>
+</html>
+

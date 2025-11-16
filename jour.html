@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Journée de travail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f4f5fb;
+        color: #1f2933;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+
+      header span {
+        font-weight: 600;
+        opacity: 0.95;
+      }
+
+      .btn-back {
+        border: none;
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        background: rgba(15, 23, 42, 0.25);
+        color: #e5e7eb;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .btn-back:hover {
+        background: rgba(15, 23, 42, 0.4);
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 1rem 2.5rem;
+        flex: 1;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+        gap: 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem 1.75rem 1.75rem;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 0.9rem;
+        font-size: 1.25rem;
+      }
+
+      label {
+        font-size: 0.9rem;
+        color: #4b5563;
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+
+      input[type="time"],
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        background: #f9fafb;
+      }
+
+      input[type="time"]:focus,
+      select:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+        background: #ffffff;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .field {
+        margin-bottom: 0.75rem;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .btn-primary {
+        background: #4f46e5;
+        color: white;
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.35);
+      }
+
+      .btn-primary:hover {
+        background: #4338ca;
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+        padding-inline: 0.7rem;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .hint {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.35rem;
+      }
+
+      .slots {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        border-radius: 10px;
+        border: 1px dashed #e5e7eb;
+        background: #f9fafb;
+        max-height: 280px;
+        overflow-y: auto;
+      }
+
+      .slot {
+        padding: 0.6rem 0.8rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .slot:last-child {
+        border-bottom: none;
+      }
+
+      .slot-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .slot-time {
+        font-size: 0.9rem;
+        color: #111827;
+        font-weight: 600;
+      }
+
+      .slot-type {
+        font-size: 0.85rem;
+        color: #4b5563;
+      }
+
+      .slot-empty {
+        padding: 0.85rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #9ca3af;
+        font-style: italic;
+      }
+
+      .summary-main {
+        font-size: 1.05rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .summary-highlight {
+        font-weight: 600;
+        color: #4f46e5;
+      }
+
+      .shortcuts {
+        margin: 0.75rem 0 0;
+        padding: 0;
+        list-style: none;
+        border-radius: 10px;
+        border: 1px dashed #e5e7eb;
+        background: #f9fafb;
+        max-height: 180px;
+        overflow-y: auto;
+      }
+
+      .shortcut {
+        padding: 0.55rem 0.8rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .shortcut:last-child {
+        border-bottom: none;
+      }
+
+      .shortcut-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      .shortcut-key {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .shortcut-activity {
+        font-size: 0.85rem;
+        color: #4b5563;
+      }
+
+      .shortcut-empty {
+        padding: 0.75rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #9ca3af;
+        font-style: italic;
+      }
+
+      .btn-small {
+        padding: 0.25rem 0.8rem;
+        font-size: 0.75rem;
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Journée de travail</h1>
+        <span id="dayName"></span>
+      </div>
+      <button
+        class="btn-back"
+        type="button"
+        onclick="window.location.href='index.html'"
+      >
+        ← Retour aux jours
+      </button>
+    </header>
+
+    <main>
+      <div class="layout">
+        <section class="card" aria-label="Créneaux de la journée">
+          <h2>Ajouter un créneau</h2>
+          <form id="slotForm">
+            <div class="field-row">
+              <div class="field">
+                <label for="startTime">Heure de début</label>
+                <input type="time" id="startTime" required />
+              </div>
+              <div class="field">
+                <label for="endTime">Heure de fin</label>
+                <input type="time" id="endTime" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="shortcut"
+                >Raccourci (optionnel, ex : "Adrien")</label
+              >
+              <input
+                type="text"
+                id="shortcut"
+                placeholder='Ex : Adrien (lié à "Ménage")'
+              />
+            </div>
+            <div class="field">
+              <label for="activity">Type d'activité (à écrire)</label>
+              <input
+                type="text"
+                id="activity"
+                placeholder='Ex : Ménage, Accueil, Cuisine...'
+                required
+              />
+            </div>
+            <button type="submit" class="btn-primary">Ajouter le créneau</button>
+            <p class="hint">
+              Ajoute tous tes créneaux (tu écris toi-même le type d'activité)
+              pour que l'application calcule ton temps de travail.
+            </p>
+          </form>
+
+          <h2>Liste des créneaux</h2>
+          <ul class="slots" id="slotsList">
+            <li class="slot-empty">Aucun créneau pour l'instant.</li>
+          </ul>
+        </section>
+
+        <section class="card" aria-label="Résumé de la journée">
+          <h2>Résumé de la journée</h2>
+          <p id="summaryMain" class="summary-main">
+            Ajoute des créneaux pour voir ton temps de travail.
+          </p>
+          <p id="summaryDetail" class="hint">
+            L'application calcule la durée totale de travail et la part de
+            ménage.
+          </p>
+          <button
+            type="button"
+            id="viewDayBtn"
+            class="btn-primary"
+            style="margin-top: 0.9rem"
+          >
+            📅 Voir cette journée en grand
+          </button>
+
+          <h2 style="margin-top: 1.5rem">Raccourcis d'activités</h2>
+          <ul class="shortcuts" id="shortcutsList">
+            <li class="shortcut-empty">Aucun raccourci pour l'instant.</li>
+          </ul>
+          <p class="hint">
+            Exemple : <strong>Adrien → Ménage</strong>. Quand tu écris
+            "Adrien" dans le champ raccourci, l'activité "Ménage" sera
+            choisie automatiquement.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const days = [
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi",
+        "Dimanche",
+      ];
+
+      const dayIndexFromStorage = Number(
+        localStorage.getItem("selectedDayIndex")
+      );
+      const selectedDayIndex = Number.isNaN(dayIndexFromStorage)
+        ? 0
+        : dayIndexFromStorage;
+
+      const dayNameEl = document.getElementById("dayName");
+      const slotForm = document.getElementById("slotForm");
+      const startTimeInput = document.getElementById("startTime");
+      const endTimeInput = document.getElementById("endTime");
+      const activitySelect = document.getElementById("activity");
+      const shortcutInput = document.getElementById("shortcut");
+      const slotsList = document.getElementById("slotsList");
+      const summaryMain = document.getElementById("summaryMain");
+      const summaryDetail = document.getElementById("summaryDetail");
+      const viewDayBtn = document.getElementById("viewDayBtn");
+      const shortcutsList = document.getElementById("shortcutsList");
+
+      dayNameEl.textContent = "Jour : " + days[selectedDayIndex];
+
+      let schedule =
+        JSON.parse(localStorage.getItem("daySchedule") || "null") || [];
+      if (!Array.isArray(schedule) || schedule.length !== 7) {
+        schedule = Array.from({ length: 7 }, () => []);
+      }
+
+      let shortcuts =
+        JSON.parse(localStorage.getItem("activityShortcuts") || "null") || {};
+      if (!shortcuts || typeof shortcuts !== "object") {
+        shortcuts = {};
+      }
+
+      function saveSchedule() {
+        localStorage.setItem("daySchedule", JSON.stringify(schedule));
+      }
+
+      function saveShortcuts() {
+        localStorage.setItem("activityShortcuts", JSON.stringify(shortcuts));
+      }
+
+      function parseMinutes(time) {
+        if (!time || !time.includes(":")) return 0;
+        const [h, m] = time.split(":").map(Number);
+        return h * 60 + m;
+      }
+
+      function formatDuration(minutes) {
+        if (minutes <= 0) return "0h";
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        if (m === 0) return h + "h";
+        return h + "h" + String(m).padStart(2, "0");
+      }
+
+      function renderSlots() {
+        const slots = schedule[selectedDayIndex];
+        slotsList.innerHTML = "";
+
+        if (!slots || slots.length === 0) {
+          const li = document.createElement("li");
+          li.className = "slot-empty";
+          li.textContent = "Aucun créneau pour l'instant.";
+          slotsList.appendChild(li);
+          summaryMain.textContent =
+            "Ajoute des créneaux pour voir ton temps de travail.";
+          summaryDetail.textContent =
+            "L'application calcule la durée totale de travail et la part de ménage.";
+          return;
+        }
+
+        let totalMinutes = 0;
+        let cleaningMinutes = 0;
+
+        slots.forEach((slot, index) => {
+          const start = parseMinutes(slot.start);
+          const end = parseMinutes(slot.end);
+          const duration = Math.max(0, end - start);
+          totalMinutes += duration;
+          if (slot.activity === "Ménage") {
+            cleaningMinutes += duration;
+          }
+
+          const li = document.createElement("li");
+          li.className = "slot";
+
+          const info = document.createElement("div");
+          info.className = "slot-info";
+
+          const timeEl = document.createElement("div");
+          timeEl.className = "slot-time";
+          timeEl.textContent = slot.start + " - " + slot.end;
+
+          const typeEl = document.createElement("div");
+          typeEl.className = "slot-type";
+          // Si un raccourci existe, on affiche seulement le raccourci (ex : "Adrien")
+          // sinon on affiche le type d'activité écrit (ex : "Ménage").
+          typeEl.textContent = slot.shortcut || slot.activity;
+
+          info.appendChild(timeEl);
+          info.appendChild(typeEl);
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn-danger";
+          deleteBtn.type = "button";
+          deleteBtn.textContent = "Supprimer";
+          deleteBtn.addEventListener("click", () => {
+            schedule[selectedDayIndex].splice(index, 1);
+            saveSchedule();
+            renderSlots();
+          });
+
+          li.appendChild(info);
+          li.appendChild(deleteBtn);
+          slotsList.appendChild(li);
+        });
+
+        const totalText = formatDuration(totalMinutes);
+        const cleaningText = formatDuration(cleaningMinutes);
+
+        if (totalMinutes === 0) {
+          summaryMain.textContent =
+            "Ajoute des créneaux pour voir ton temps de travail.";
+          summaryDetail.textContent =
+            "L'application calcule la durée totale de travail et la part de ménage.";
+        } else {
+          summaryMain.innerHTML =
+            "Aujourd'hui tu travailles " +
+            '<span class="summary-highlight">' +
+            totalText +
+            "</span>" +
+            " et dans ces " +
+            '<span class="summary-highlight">' +
+            totalText +
+            "</span>" +
+            " tu as " +
+            '<span class="summary-highlight">' +
+            cleaningText +
+            "</span>" +
+            " de ménage.";
+
+          summaryDetail.textContent =
+            "Les heures sont calculées à partir de tous les créneaux saisis ci-dessus.";
+        }
+      }
+
+      function renderShortcuts() {
+        shortcutsList.innerHTML = "";
+        const keys = Object.keys(shortcuts);
+
+        if (keys.length === 0) {
+          const li = document.createElement("li");
+          li.className = "shortcut-empty";
+          li.textContent = "Aucun raccourci pour l'instant.";
+          shortcutsList.appendChild(li);
+          return;
+        }
+
+        keys.forEach((key) => {
+          const li = document.createElement("li");
+          li.className = "shortcut";
+
+          const info = document.createElement("div");
+          info.className = "shortcut-info";
+
+          const keyEl = document.createElement("div");
+          keyEl.className = "shortcut-key";
+          keyEl.textContent = key;
+
+          const actEl = document.createElement("div");
+          actEl.className = "shortcut-activity";
+          actEl.textContent = "→ " + shortcuts[key];
+
+          info.appendChild(keyEl);
+          info.appendChild(actEl);
+
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "btn-danger btn-small";
+          delBtn.textContent = "Supprimer";
+          delBtn.addEventListener("click", () => {
+            delete shortcuts[key];
+            saveShortcuts();
+            renderShortcuts();
+          });
+
+          li.appendChild(info);
+          li.appendChild(delBtn);
+          shortcutsList.appendChild(li);
+        });
+      }
+
+      slotForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+        const rawActivity = activitySelect.value.trim();
+        let activity = rawActivity;
+        let shortcutKey = shortcutInput.value.trim();
+
+        if (!start || !end || !activity) {
+          alert("Merci de remplir tous les champs.");
+          return;
+        }
+
+        if (end <= start) {
+          alert("L'heure de fin doit être après l'heure de début.");
+          return;
+        }
+
+        // Si aucun raccourci saisi mais que l'activité correspond à un raccourci existant,
+        // on utilise ce raccourci (ex : taper "Adrien" dans activité => Ménage).
+        if (!shortcutKey && shortcuts[rawActivity]) {
+          shortcutKey = rawActivity;
+          activity = shortcuts[rawActivity];
+        }
+
+        if (shortcutKey) {
+          if (shortcuts[shortcutKey]) {
+            // Si un raccourci existe déjà, on force l'activité associée
+            activity = shortcuts[shortcutKey];
+          } else {
+            // Sinon, on crée automatiquement un nouveau raccourci
+            shortcuts[shortcutKey] = activity;
+            saveShortcuts();
+            renderShortcuts();
+          }
+        }
+
+        schedule[selectedDayIndex].push({
+          start,
+          end,
+          activity,
+          shortcut: shortcutKey || null,
+        });
+        saveSchedule();
+
+        startTimeInput.value = "";
+        endTimeInput.value = "";
+        activitySelect.value = "";
+        shortcutInput.value = "";
+
+        renderSlots();
+      });
+
+      viewDayBtn.addEventListener("click", () => {
+        // On garde le jour sélectionné (déjà dans localStorage) et on va sur la vue en grand
+        localStorage.setItem("selectedDayIndex", String(selectedDayIndex));
+        window.location.href = "emploi.html";
+      });
+
+      renderSlots();
+      renderShortcuts();
+    </script>
+  </body>
+</html>
+
+

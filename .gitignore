@@ -1,0 +1,28 @@
+.# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Node / JS (au cas où plus tard)
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Builds / dist
+dist/
+build/
+out/
+
+# Environnements
+.env
+.env.local
+.env.*
+
+# Divers
+.vscode/
+.idea/
+*.iml
+
+
